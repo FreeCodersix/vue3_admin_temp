@@ -1,31 +1,16 @@
 <template>
-  <el-form size="large" class="login-content-form" ref="ruleFormRef" :rules="rules"   :model="state.ruleForm">
-    <el-form-item class="login-animation1" prop="userName">
-      <el-input
-          text
-          placeholder="请输入用户名"
-          v-model="state.ruleForm.userName"
-          clearable
-          autocomplete="off"
-      >
+  <el-form size="large" class="login-content-form">
+    <el-form-item class="login-animation1">
+      <el-input text placeholder="用户名 admin 或不输均为 common" v-model="state.ruleForm.userName" clearable autocomplete="off">
         <template #prefix>
-          <el-icon class="el-input__icon">
-            <ele-User/>
-          </el-icon>
+          <el-icon class="el-input__icon"><ele-User /></el-icon>
         </template>
       </el-input>
     </el-form-item>
-    <el-form-item class="login-animation2" prop="password">
-      <el-input
-          :type="state.isShowPassword ? 'text' : 'password'"
-          placeholder="请输入密码"
-          v-model="state.ruleForm.password"
-          autocomplete="off"
-      >
+    <el-form-item class="login-animation2">
+      <el-input :type="state.isShowPassword ? 'text' : 'password'" placeholder="密码：123456" v-model="state.ruleForm.password" autocomplete="off">
         <template #prefix>
-          <el-icon class="el-input__icon">
-            <ele-Unlock/>
-          </el-icon>
+          <el-icon class="el-input__icon"><ele-Unlock /></el-icon>
         </template>
         <template #suffix>
           <i
@@ -37,20 +22,11 @@
         </template>
       </el-input>
     </el-form-item>
-    <el-form-item class="login-animation3" prop="code">
+    <el-form-item class="login-animation3">
       <el-col :span="15">
-        <el-input
-            text
-            maxlength="4"
-            placeholder="请输入验证码"
-            v-model="state.ruleForm.code"
-            clearable
-            autocomplete="off"
-        >
+        <el-input text maxlength="4" placeholder="请输入验证码" v-model="state.ruleForm.code" clearable autocomplete="off">
           <template #prefix>
-            <el-icon class="el-input__icon">
-              <ele-Position/>
-            </el-icon>
+            <el-icon class="el-input__icon"><ele-Position /></el-icon>
           </template>
         </el-input>
       </el-col>
@@ -60,51 +36,37 @@
       </el-col>
     </el-form-item>
     <el-form-item class="login-animation4">
-      <el-button
-          type="primary"
-          class="login-content-submit"
-          round
-          v-waves
-          @click="onSignIn(ruleFormRef)"
-          :loading="state.loading.signIn"
-      >
-        登 录
+      <el-button type="primary" class="login-content-submit" round v-waves @click="onSignIn" :loading="state.loading.signIn">
+        <span>登 录</span>
       </el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script setup lang="ts" name="loginAccount">
-import {reactive, computed, ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
-import {ElMessage, FormInstance} from "element-plus";
-import Cookies from "js-cookie";
-import {initBackEndControlRoutes} from "/@/router/backEnd";
-import {Local} from "/@/utils/storage";
-import {formatAxis} from "/@/utils/formatTime";
-import {NextLoading} from "/@/utils/loading";
-import {useLoginApi} from "/@/api/login";
-import {checkPwd} from "/@/utils/toolsValidate";
-import {Base64} from "js-base64"; //引入base64加密，用于记住密码
+import { reactive, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import Cookies from 'js-cookie';
+import { storeToRefs } from 'pinia';
+import { useThemeConfig } from '/@/stores/themeConfig';
+import { initFrontEndControlRoutes } from '/@/router/frontEnd';
+import { initBackEndControlRoutes } from '/@/router/backEnd';
+import { Session } from '/@/utils/storage';
+import { formatAxis } from '/@/utils/formatTime';
+import { NextLoading } from '/@/utils/loading';
+
 // 定义变量内容
-const ruleFormRef = ref<FormInstance>();
+const storesThemeConfig = useThemeConfig();
+const { themeConfig } = storeToRefs(storesThemeConfig);
 const route = useRoute();
 const router = useRouter();
-const rules = reactive({
-  userName: [{required: true, message: "请输入账号", trigger: "change"}],
-  code: [{required: true, message: "请输入验证码", trigger: "change"}],
-  password: [
-    {required: true, message: "请输入密码", trigger: "change"},
-    {validator: checkPwd, trigger: "change"},
-  ],
-});
 const state = reactive({
   isShowPassword: false,
   ruleForm: {
-    userName: "",
-    password: "",
-    code: "",
-    rememberPassword: false
+    userName: 'admin',
+    password: '123456',
+    code: '1234',
   },
   loading: {
     signIn: false,
@@ -116,65 +78,49 @@ const currentTime = computed(() => {
   return formatAxis(new Date());
 });
 // 登录
-const onSignIn = (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  formEl.validate(async (valid) => {
-    if (!valid) return false
-    state.loading.signIn = true;
-    // 存储 token 到浏览器缓存
-    Cookies.set("saas_user_name", state.ruleForm.userName);
-    const result: any = await useLoginApi().signIn(state.ruleForm);
-    if (result.code === "suc") {
-      // 判断是否为记住密码
-      if (state.ruleForm.rememberPassword) {
-        Local.set("saas_user_name", state.ruleForm.userName);
-        Local.set("saas_password", Base64.encode(state.ruleForm.password));
-      } else {
-        Local.remove("saas_user_name");
-        Local.remove("saas_password");
-      }
-      Cookies.set("saas_user_id", result.data.user_id);
-      Local.set("userInfo", result.data);
-      Local.set("token", result.data.token);
-      // Local.set("user_psw_ret", result.data.user_psw_ret); // false： 没有修改过密码,首页弹出msg
-      await initBackEndControlRoutes();
-      signInSuccess();
-      // if (result.data.user_psw_life === "false") {
-      //   //密码过期，提示修改密码
-      //   ElMessage.warning("密码过期！请先修改密码再登录！");
-      // } else {
-      //   // Session.set('userInfo', result.data);
-      //   // Session.set('token', result.data.token);
-      //   Local.set("userInfo", result.data);
-      //   Local.set("token", result.data.token);
-      //   // Local.set("user_psw_ret", result.data.user_psw_ret); // false： 没有修改过密码,首页弹出msg
-      //   await initBackEndControlRoutes();
-      //   signInSuccess();
-      // }
-    } else {
-      state.loading.signIn = false;
-      ElMessage.error(result.msg);
-    }
-  });
+const onSignIn = async () => {
+  state.loading.signIn = true;
+  // 存储 token 到浏览器缓存
+  Session.set('token', Math.random().toString(36).substr(0));
+  // 模拟数据，对接接口时，记得删除多余代码及对应依赖的引入。用于 `/src/stores/userInfo.ts` 中不同用户登录判断（模拟数据）
+  Cookies.set('userName', state.ruleForm.userName);
+  if (!themeConfig.value.isRequestRoutes) {
+    // 前端控制路由，2、请注意执行顺序
+    const isNoPower = await initFrontEndControlRoutes();
+    signInSuccess(isNoPower);
+  } else {
+    // 模拟后端控制路由，isRequestRoutes 为 true，则开启后端控制路由
+    // 添加完动态路由，再进行 router 跳转，否则可能报错 No match found for location with path "/"
+    const isNoPower = await initBackEndControlRoutes();
+    // 执行完 initBackEndControlRoutes，再执行 signInSuccess
+    signInSuccess(isNoPower);
+  }
 };
 // 登录成功后的跳转
-const signInSuccess = () => {
-  // 初始化登录成功时间问候语
-  let currentTimeInfo = currentTime.value;
-  // 登录成功，跳到转首页
-  // 如果是复制粘贴的路径，非首页/登录页，那么登录成功后重定向到对应的路径中
-  if (route.query?.redirect) {
-    router.push({path: "/home"});
+const signInSuccess = (isNoPower: boolean | undefined) => {
+  if (isNoPower) {
+    ElMessage.warning('抱歉，您没有登录权限');
+    Session.clear();
   } else {
-    router.push("/");
+    // 初始化登录成功时间问候语
+    let currentTimeInfo = currentTime.value;
+    // 登录成功，跳到转首页
+    // 如果是复制粘贴的路径，非首页/登录页，那么登录成功后重定向到对应的路径中
+    if (route.query?.redirect) {
+      router.push({
+        path: <string>route.query?.redirect,
+        query: Object.keys(<string>route.query?.params).length > 0 ? JSON.parse(<string>route.query?.params) : '',
+      });
+    } else {
+      router.push('/');
+    }
+    // 登录成功提示
+    const signInText = '欢迎回来！';
+    ElMessage.success(`${currentTimeInfo}，${signInText}`);
+    // 添加 loading，防止第一次进入界面时出现短暂空白
+    NextLoading.start();
   }
-  // 登录成功提示
-  // 关闭 loading
-  state.loading.signIn = true;
-  // const signInText = '欢迎回来！';
-  ElMessage.success(`${currentTimeInfo}，欢迎回来！`);
-  // 添加 loading，防止第一次进入界面时出现短暂空白
-  NextLoading.start();
+  state.loading.signIn = false;
 };
 </script>
 
@@ -190,24 +136,20 @@ const signInSuccess = () => {
       animation-delay: calc($i/10) + s;
     }
   }
-
   .login-content-password {
     display: inline-block;
     width: 20px;
     cursor: pointer;
-
     &:hover {
       color: #909399;
     }
   }
-
   .login-content-code {
     width: 100%;
     padding: 0;
     font-weight: bold;
     letter-spacing: 5px;
   }
-
   .login-content-submit {
     width: 100%;
     letter-spacing: 2px;

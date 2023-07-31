@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts" name="systemUserDialog">
-import { reactive, ref } from 'vue';
+import { reactive, ref,defineEmits} from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);

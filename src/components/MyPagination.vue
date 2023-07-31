@@ -19,7 +19,7 @@
 * demo可参考identity/user/index.vue文件的52行，方法参照该文件的paginationChange
 * */
 
-import {watch, reactive, onMounted} from "vue";
+import {watch, reactive, onMounted,defineEmits} from "vue";
 import {defineProps, readonly} from "vue-demi";
 import _ from 'lodash'
 onMounted(()=>{

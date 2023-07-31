@@ -14,6 +14,7 @@
 </template>
 
 <script setup lang="ts" name="iconSelectorList">
+import {defineEmits} from 'vue'
 // 定义父组件传过来的值
 const props = defineProps({
 	// 图标列表数据

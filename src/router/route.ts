@@ -63,6 +63,21 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 				},
 			},
 			{
+				path: '/fabricEditor',
+				name: 'fabricEditor',
+				component: () => import('/@/views/fabricEditor/index.vue'),
+				meta: {
+					title: '图片编辑',
+					isLink: '',
+					isHide: false,
+					isKeepAlive: true,
+					isAffix: true,
+					isIframe: false,
+					roles: ['admin', 'common'],
+					icon: 'iconfont icon-shouye',
+				},
+			},
+			{
 				path: '/identity',
 				name: 'identity',
 				meta: {
