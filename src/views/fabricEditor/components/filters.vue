@@ -1,11 +1,3 @@
-<!--
- * @Author: 秦少卫
- * @Date: 2023-04-06 23:04:38
- * @LastEditors: 秦少卫
- * @LastEditTime: 2023-07-16 12:48:28
- * @Description: 图片滤镜
--->
-
 <template>
   <div v-if="mixinState.mSelectMode === 'one' && state.type === 'image'" class="box">
     <Collapse>
@@ -81,8 +73,8 @@
 
 <script name="Filter" setup>
 import useSelect from '../hooks/select';
-import { uiType, paramsFilters, combinationFilters } from '/@/config/constants/filter';
-import {inject,getCurrentInstance} from 'vue'
+import { uiType, paramsFilters, combinationFilters } from '../config/constants/filter';
+import {inject,getCurrentInstance,reactive,onMounted,onBeforeUnmount } from 'vue'
 const { fabric, mixinState, canvasEditor } = useSelect();
 const event = inject('event');
 const update = getCurrentInstance();

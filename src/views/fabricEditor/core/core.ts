@@ -3,6 +3,7 @@ import hotkeys from 'hotkeys-js';
 import ContextMenu from './ContextMenu.js';
 import ServersPlugin from './ServersPlugin';
 import { AsyncSeriesHook } from 'tapable';
+import {fabric} from "fabric";
 
 class Editor extends EventEmitter {
   canvas: fabric.Canvas;
@@ -86,8 +87,7 @@ class Editor extends EventEmitter {
     this.hooks.forEach((hookName) => {
       const hook = plugin[hookName];
       if (hook) {
-        this.hooksEntity[hookName].tapPromise(plugin.pluginName + hookName, function () {
-          // eslint-disable-next-line prefer-rest-params
+        this.hooksEntity[hookName].tapPromise(plugin.pluginName + hookName, async function () {
           return hook.apply(plugin, [...arguments]);
         });
       }
@@ -158,7 +158,7 @@ class Editor extends EventEmitter {
   }
 
   _initServersPlugin() {
-    this.use(ServersPlugin, {});
+    this.use(ServersPlugin as IPluginClass, {});
   }
 }
 

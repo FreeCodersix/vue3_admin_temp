@@ -10,16 +10,16 @@
   <div style="display: inline-block">
     <Divider plain orientation="left">{{ $t('title_template') }}</Divider>
     <Tooltip
-      :content="item.label"
-      v-for="(item, i) in state.list"
-      :key="`${i}-bai1-button`"
-      placement="top"
+        :content="item.label"
+        v-for="(item, i) in state.list"
+        :key="`${i}-bai1-button`"
+        placement="top"
     >
       <img
-        class="tmpl-img"
-        :alt="item.label"
-        v-lazy="item.src"
-        @click="beforeClearTip(item.tempUrl)"
+          class="tmpl-img"
+          :alt="item.label"
+          v-lazy="item.src"
+          @click="beforeClearTip(item.tempUrl)"
       />
     </Tooltip>
   </div>
@@ -29,12 +29,13 @@
 import useSelect from '../hooks/select';
 // import { downFontByJSON } from '@/utils/utils';
 import axios from 'axios';
-import { Spin, Modal } from 'view-ui-plus';
-import { useI18n } from 'vue-i18n';
+import {Spin, Modal} from 'view-ui-plus';
+import {useI18n} from 'vue-i18n';
 import {reactive} from 'vue'
+
 const repoSrc = import.meta.env.VITE_API_URL;
-const { t } = useI18n();
-const { canvasEditor } = useSelect();
+const {t} = useI18n();
+const {canvasEditor} = useSelect();
 const state = reactive({
   jsonFile: null,
   list: [
@@ -57,10 +58,10 @@ const state = reactive({
 });
 
 // 插入文件
-const insertSvgFile = () => {
+const insertSvgFile =  (json) => {
   // state.jsonFile
   // console.log(state.jsonFile);
-  canvasEditor.insertSvgFile(state.jsonFile);
+   canvasEditor.insertSvgFile(json);
   // Spin.show({
   //   render: (h) => h('div', t('alert.loading_fonts')),
   // });
@@ -94,15 +95,15 @@ const getTempList = () => {
   });
   const getTemp = axios.get(`${repoSrc}template/index.json`);
   getTemp
-    .then((res) => {
-      state.list = res.data.data.map((item) => {
-        item.tempUrl = repoSrc + item.tempUrl;
-        item.src = repoSrc + item.src;
-        return item;
-      });
-      Spin.hide();
-    })
-    .catch(Spin.hide);
+      .then((res) => {
+        state.list = res.data.data.map((item) => {
+          item.tempUrl = repoSrc + item.tempUrl;
+          item.src = repoSrc + item.src;
+          return item;
+        });
+        Spin.hide();
+      })
+      .catch(Spin.hide);
 };
 
 const beforeClearTip = (tmplUrl) => {
@@ -123,8 +124,8 @@ const getTempData = (tmplUrl) => {
   const getTemp = axios.get(tmplUrl);
   getTemp.then((res) => {
     state.jsonFile = JSON.stringify(res.data);
-    Spin.hide();
-    insertSvgFile();
+    // Spin.hide();
+    insertSvgFile(state.jsonFile,Spin.hide());
   });
 };
 

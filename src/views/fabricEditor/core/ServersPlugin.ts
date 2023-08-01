@@ -55,16 +55,17 @@ class ServersPlugin {
     });
   }
 
-  insertSvgFile(jsonFile) {
+   insertSvgFile(jsonFile,cb=()=>{}) {
     // 加载前钩子
-    this.editor.hooksEntity.hookImportBefore.callAsync(jsonFile, () => {
-      // console.log(jsonFile, '2222');
+     this.editor.hooksEntity.hookImportBefore.callAsync(jsonFile, () => {
+      console.log(jsonFile, '2222');
       this.canvas.loadFromJSON(jsonFile, () => {
-        // console.log(jsonFile, '33333');
+        console.log(jsonFile, '33333');
         this.canvas.renderAll();
         // 加载后钩子
         this.editor.hooksEntity.hookImportAfter.callAsync(jsonFile, () => {
           this.canvas.renderAll();
+          cb()
         });
       });
     });

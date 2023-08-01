@@ -290,7 +290,7 @@ import { getPolygonVertices } from '../utils/math';
 import InputNumber from './inputNumber';
 import { Spin } from 'view-ui-plus';
 import {inject,getCurrentInstance,reactive,ref,onMounted,onBeforeUnmount  } from 'vue'
-
+import fontData from '../styles/font'
 const event = inject('event');
 const update = getCurrentInstance();
 const repoSrc = import.meta.env.APP_REPO;
@@ -430,12 +430,12 @@ const textAlignListSvg = [
 ];
 
 const getFreeFontList = () => {
-  axios.get(`${repoSrc}/font/free-font.json`).then((res) => {
-    fontFamilyList.value = [
-      ...fontFamilyList.value,
-      ...Object.entries(res.data).map(([, value]) => value),
-    ];
-  });
+  // axios.get(`../styles/font.json`).then((res) => {
+  //   fontFamilyList.value = [
+  //     ...fontFamilyList.value,
+  //     ...Object.entries(fontData).map(([, value]) => value),
+  //   ];
+  // });
 };
 
 const getObjectAttr = (e) => {
@@ -479,7 +479,7 @@ const selectCancel = () => {
 
 const init = () => {
   // 获取字体数据
-  getFreeFontList();
+  // getFreeFontList();
 
   event.on('selectCancel', selectCancel);
   event.on('selectOne', getObjectAttr);

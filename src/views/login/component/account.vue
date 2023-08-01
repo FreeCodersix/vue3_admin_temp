@@ -155,6 +155,7 @@ const signInSuccess = (isNoPower: boolean | undefined) => {
     letter-spacing: 2px;
     font-weight: 300;
     margin-top: 15px;
+    padding: 0;
   }
 }
 </style>

@@ -236,7 +236,7 @@ onMounted(() => {
 //     const fileStr = `data:text/json;charset=utf-8,${encodeURIComponent(
 //       JSON.stringify(json, null, '\t')
 //     )}`;
-//     downFile(fileStr, 'font.json');
+//     downFile(fileStr, 'font.ts');
 //     const dataUrl = activeObject.toDataURL();
 //     downFile(dataUrl, 'font.png');
 //   }
